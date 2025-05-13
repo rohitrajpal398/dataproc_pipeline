@@ -30,10 +30,7 @@ CLUSTER_CONFIG = {
         "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 50},
     },
     "worker_config": {
-        "num_instances": 2,
-        "machine_type_uri": "n1-standard-2",
-        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 50},
-    },
+        "num_instances": 0 },
 }
 
 PYSPARK_JOB_1 = {
