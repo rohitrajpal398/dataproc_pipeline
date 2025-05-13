@@ -11,7 +11,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 
 # variable section
 PROJECT_ID = "airy-actor-457907-a8"
-REGION = "us-east1"
+REGION = "us-central1"
 CLUSTER_NAME = "demo-cluster"
 ARGS = {
     "owner": "Rohit Rajpal",
@@ -26,13 +26,13 @@ ARGS = {
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "e2-medium",
-        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 32},
+        "machine_type_uri": "n1-standard-2",
+        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 50},
     },
     "worker_config": {
-        "num_instances": 1,
-        "machine_type_uri": "e2-medium",
-        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 32},
+        "num_instances": 2,
+        "machine_type_uri": "n1-standard-2",
+        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 50},
     },
 }
 
