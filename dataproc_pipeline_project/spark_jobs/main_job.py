@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 
 def main():
-    spark = Spark Session.builder.appName("SalesPipeline").getOrCreate()
+    spark = SparkSession.builder.appName("SalesPipeline").getOrCreate()
     df = spark.read.csv("gs://sample-data-for-pract1/orders.csv", header=True, inferSchema=True)
     df = df.withColumn("total", df.quantity * df.price)
     df.write.format("bigquery") \
