@@ -22,6 +22,7 @@ ARGS = {
     "retry_delay": timedelta(minutes=2),
     "start_date": days_ago(1),
 }
+
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
@@ -34,16 +35,11 @@ CLUSTER_CONFIG = {
         "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 32},
     },
 }
+
 PYSPARK_JOB_1 = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": "gs://sample-data-for-pract1/dummy_pyspark_job_1.py"},
-}
-
-PYSPARK_JOB_2 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": "gs://sample-data-for-pract1/dummy_pyspark_job_2.py"},
+    "pyspark_job": {"main_python_file_uri": "gs://sample-data-for-pract1/spark_jobs/main_job.py"},
 }
 
 # define the dag
@@ -70,12 +66,6 @@ with DAG(
         region=REGION, 
         project_id=PROJECT_ID
     )
-    pyspark_task_2 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_2", 
-        job=PYSPARK_JOB_2, 
-        region=REGION, 
-        project_id=PROJECT_ID
-    )
 
     delete_cluster = DataprocDeleteClusterOperator(
         task_id="delete_cluster",
@@ -85,4 +75,4 @@ with DAG(
     )
 
 # define the task sequence
-create_cluster >> pyspark_task_1 >> pyspark_task_2 >> delete_cluster
+create_cluster >> pyspark_task_1 >> delete_cluster
