@@ -14,15 +14,34 @@ BUCKET_NAME = "sample-data-for-pract1"
 BQ_TEMP_BUCKET = "sample-data-for-pract1/temp"
 
 # ✅ Updated to single-node cluster using n1-standard-2
+# CLUSTER_CONFIG = {
+#     "master_config": {
+#         "num_instances": 1,
+#         "machine_type_uri": "n1-standard-2"
+#     },
+#     "worker_config": {
+#         "num_instances": 0
+#     }
+# }
+
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "n1-standard-2"
+        "machine_type_uri": "e2-medium",  # you can try e2-small or e2-micro
+        "disk_config": {
+            "boot_disk_type": "pd-balanced",
+            "boot_disk_size_gb": 50,
+        },
     },
-    "worker_config": {
-        "num_instances": 0
-    }
+    "software_config": {
+        "image_version": "2.1-debian11",
+        "optional_components": ["ANACONDA", "JUPYTER"],
+    },
+    "single_node": True
 }
+
+
+
 
 PYSPARK_JOB = {
     "reference": {"project_id": PROJECT_ID},
