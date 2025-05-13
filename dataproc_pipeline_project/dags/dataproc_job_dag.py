@@ -16,11 +16,13 @@ BQ_TEMP_BUCKET = "sample-data-for-pract1"
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "n1-standard-2"
+        "machine_type_uri": "n1-standard-2",
+        "disk_config": {"boot_disk_size_gb": 100}
     },
     "worker_config": {
         "num_instances": 2,
-        "machine_type_uri": "n1-standard-2"
+        "machine_type_uri": "n1-standard-2",
+        "disk_config": {"boot_disk_size_gb": 100}
     }
 }
 
