@@ -1,16 +1,15 @@
-name: Deploy Dataflow Streaming Pipeline (Classic Template)
+name: Deploy Dataproc Job and DAG
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -18,7 +17,7 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Write GCP credentials file
+      - name: Write GCP credentials to file
         run: |
           echo '${{ secrets.GCP_SA_KEY }}' > ${{ github.workspace }}/gcloud-key.json
 
@@ -33,23 +32,12 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: airy-actor-457907-a8
-          install_components: 'beta'
+          install_components: 'gsutil'
 
-      - name: Build Classic Template (Streaming Pipeline)
+      - name: Upload Spark Job to GCS
         run: |
-          python dataflow_pipeline.py \
-            --runner=DataflowRunner \
-            --project=airy-actor-457907-a8 \
-            --region=us-central1 \
-            --temp_location=gs://raw-bucket-1/temp \
-            --staging_location=gs://raw-bucket-1/staging \
-            --template_location=gs://raw-bucket-1/templates/streaming_template
+          gsutil cp dataproc_pipeline_project/spark_jobs/main_job.py gs://sample-data-for-pract1/spark_jobs/
 
-      - name: Launch Streaming Job from Template (Non-Blocking)
+      - name: Upload Airflow DAG to Composer Environment
         run: |
-          gcloud dataflow jobs run "streaming-job-$(date +%s)" \
-            --gcs-location=gs://raw-bucket-1/templates/streaming_template \
-            --region=us-central1 \
-            --async
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcloud-key.json
+          gsutil cp dataproc_pipeline_project/dags/dataproc_job_dag.py gs://us-central1-sanbox-env-e1b4197d-bucket/dags/
