@@ -22,8 +22,10 @@ jobs:
 
       - name: Upload Spark Job to GCS
         run: |
-          gsutil cp spark_jobs/main_job.py gs://sample-data-for-pract1/spark_jobs/
+          gsutil cp dataproc_pipeline_project/spark_jobs/main_job.py gs://sample-data-for-pract1/spark_jobs/
 
       - name: Upload Airflow DAG to Composer
         run: |
           gsutil cp dags/dataproc_job_dag.py gs://us-central1-sanbox-env-e1b4197d-bucket/dags/
+
+          
