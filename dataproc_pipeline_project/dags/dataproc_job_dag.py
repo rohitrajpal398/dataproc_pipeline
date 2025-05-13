@@ -35,6 +35,8 @@ PYSPARK_JOB = {
     },
 }
 
+SERVICE_ACCOUNT_EMAIL = "963159824406-compute@developer.gserviceaccount.com"  # or your specific service account
+
 default_args = {
     "start_date": days_ago(1),
     "retries": 1,
@@ -53,14 +55,16 @@ with DAG(
         project_id=PROJECT_ID,
         cluster_config=CLUSTER_CONFIG,
         region=REGION,
-        cluster_name=CLUSTER_NAME
+        cluster_name=CLUSTER_NAME,
+        service_account=SERVICE_ACCOUNT_EMAIL  # Specify service account here
     )
 
     submit_job = DataprocSubmitJobOperator(
         task_id="submit_spark_job",
         job=PYSPARK_JOB,
         region=REGION,
-        project_id=PROJECT_ID
+        project_id=PROJECT_ID,
+        service_account=SERVICE_ACCOUNT_EMAIL  # Specify service account here
     )
 
     delete_cluster = DataprocDeleteClusterOperator(
@@ -71,4 +75,4 @@ with DAG(
         trigger_rule="all_done"
     )
 
-    create_cluster >> submit_job >> delete_cluster	
+    create_cluster >> submit_job >> delete_cluster
