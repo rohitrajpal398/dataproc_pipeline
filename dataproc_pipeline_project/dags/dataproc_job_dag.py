@@ -1,66 +1,65 @@
-# import all modules
-import airflow
 from airflow import DAG
-from datetime import datetime, timedelta
-from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator,
-    DataprocDeleteClusterOperator,
     DataprocSubmitJobOperator,
+    DataprocDeleteClusterOperator
 )
+from airflow.utils.dates import days_ago
+from datetime import timedelta
 
-# variable section
 PROJECT_ID = "airy-actor-457907-a8"
 REGION = "us-central1"
 CLUSTER_NAME = "demo-cluster"
-ARGS = {
-    "owner": "Rohit Rajpal",
-    "email_on_failure": True,
-    "email_on_retry": True,
-    "email": "****@gmail.com",
-    "retries": 2,
-    "retry_delay": timedelta(minutes=2),
-    "start_date": days_ago(1),
-}
+BUCKET_NAME = "sample-data-for-pract1"
+BQ_TEMP_BUCKET = "sample-data-for-pract1/temp"
 
+# ✅ Updated to single-node cluster using n1-standard-2
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "n1-standard-2",
-        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 50},
+        "machine_type_uri": "n1-standard-2"
     },
     "worker_config": {
-        "num_instances": 0 },
+        "num_instances": 0
+    }
 }
 
-PYSPARK_JOB_1 = {
+PYSPARK_JOB = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": "gs://sample-data-for-pract1/spark_jobs/main_job.py"},
+    "pyspark_job": {
+        "main_python_file_uri": f"gs://{BUCKET_NAME}/spark_jobs/main_job.py",
+        "jar_file_uris": ["gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"]
+    },
 }
 
-# define the dag
-with DAG(
-    dag_id="level_2_dag",
-    schedule_interval="0 5 * * *",
-    description="DAG to create a Dataproc cluster, run PySpark jobs, and delete the cluster",
-    default_args = ARGS,
-    tags=["pyspark","dataproc","etl", "data team"]
-) as dag: 
+# ✅ Disabled email alert to avoid `smtp_default` missing error
+default_args = {
+    "start_date": days_ago(1),
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+    "email_on_failure": False
+}
 
-# define the Tasks
+with DAG(
+    "dataproc_cluster_job_lifecycle",
+    default_args=default_args,
+    schedule_interval="@daily",
+    catchup=False
+) as dag:
+
     create_cluster = DataprocCreateClusterOperator(
         task_id="create_cluster",
         project_id=PROJECT_ID,
         cluster_config=CLUSTER_CONFIG,
         region=REGION,
-        cluster_name=CLUSTER_NAME,
+        cluster_name=CLUSTER_NAME
     )
 
-    pyspark_task_1 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_1", 
-        job=PYSPARK_JOB_1, 
-        region=REGION, 
+    submit_job = DataprocSubmitJobOperator(
+        task_id="submit_spark_job",
+        job=PYSPARK_JOB,
+        region=REGION,
         project_id=PROJECT_ID
     )
 
@@ -69,7 +68,7 @@ with DAG(
         project_id=PROJECT_ID,
         cluster_name=CLUSTER_NAME,
         region=REGION,
+        trigger_rule="all_done"
     )
 
-# define the task sequence
-create_cluster >> pyspark_task_1 >> delete_cluster
+    create_cluster >> submit_job >> delete_cluster
