@@ -23,6 +23,9 @@ CLUSTER_CONFIG = {
         "num_instances": 2,
         "machine_type_uri": "n1-standard-2",
         "disk_config": {"boot_disk_size_gb": 100}
+    },
+    "gce_cluster_config": {
+        "service_account": "963159824406-compute@developer.gserviceaccount.com"
     }
 }
 
@@ -34,8 +37,6 @@ PYSPARK_JOB = {
         "jar_file_uris": ["gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"]
     },
 }
-
-SERVICE_ACCOUNT_EMAIL = "963159824406-compute@developer.gserviceaccount.com"  # or your specific service account
 
 default_args = {
     "start_date": days_ago(1),
@@ -55,16 +56,14 @@ with DAG(
         project_id=PROJECT_ID,
         cluster_config=CLUSTER_CONFIG,
         region=REGION,
-        cluster_name=CLUSTER_NAME,
-        service_account=SERVICE_ACCOUNT_EMAIL  # Specify service account here
+        cluster_name=CLUSTER_NAME
     )
 
     submit_job = DataprocSubmitJobOperator(
         task_id="submit_spark_job",
         job=PYSPARK_JOB,
         region=REGION,
-        project_id=PROJECT_ID,
-        service_account=SERVICE_ACCOUNT_EMAIL  # Specify service account here
+        project_id=PROJECT_ID
     )
 
     delete_cluster = DataprocDeleteClusterOperator(
