@@ -8,22 +8,25 @@ from airflow.utils.dates import days_ago
 from datetime import timedelta
 
 PROJECT_ID = "airy-actor-457907-a8"
-REGION = "us-central1"
+REGION = "us-east1"
 CLUSTER_NAME = "demo-cluster"
 BUCKET_NAME = "sample-data-for-pract1"
 BQ_TEMP_BUCKET = "sample-data-for-pract1/temp"
 
 # ✅ Updated to single-node cluster using n1-standard-2
+
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "n1-standard-2"
+        "machine_type_uri": "e2-standard-2",
+        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 32},
     },
     "worker_config": {
-        "num_instances": 0
-    }
+        "num_instances": 2,
+        "machine_type_uri": "e2-standard-2",
+        "disk_config": {"boot_disk_type": "pd-balanced", "boot_disk_size_gb": 32},
+    },
 }
-
 
 
 PYSPARK_JOB = {
