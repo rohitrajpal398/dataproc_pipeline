@@ -32,10 +32,7 @@ CLUSTER_CONFIG = {
 PYSPARK_JOB = {
     "reference": {"project_id": PROJECT_ID},
     "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {
-        "main_python_file_uri": f"gs://{BUCKET_NAME}/spark_jobs/main_job.py",
-        "jar_file_uris": ["gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar"]
-    },
+    "pyspark_job": {"main_python_file_uri": f"gs://{BUCKET_NAME}/spark_jobs/main_job.py"},
 }
 
 # ✅ Disabled email alert to avoid `smtp_default` missing error
