@@ -27,18 +27,19 @@ BQ_TEMP_BUCKET = "sample-data-for-pract1/temp"
 CLUSTER_CONFIG = {
     "master_config": {
         "num_instances": 1,
-        "machine_type_uri": "e2-medium",  # adjust to e2-small/micro if needed
+        "machine_type_uri": "e2-small",  # Only 2 vCPUs
         "disk_config": {
             "boot_disk_type": "pd-balanced",
-            "boot_disk_size_gb": 50,
+            "boot_disk_size_gb": 30,
         },
     },
     "software_config": {
         "image_version": "2.1-debian11",
-        "optional_components": ["ANACONDA", "JUPYTER"],
-    }
-    # No "worker_config" => single-node cluster
+        "optional_components": ["JUPYTER"],  # keep minimal
+    },
+    # No workers => single-node behavior
 }
+
 
 
 PYSPARK_JOB = {
